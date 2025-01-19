@@ -42,8 +42,7 @@ bool InputStream::loadFile(const char* fileName, int loadType) {
 
 	if (loadType == LT_RESOURCE) {
 		strncpy(namePath, "Payload/Doom2rpg.app/Packages/", sizeof(namePath));
-		strncat(namePath, fileName, sizeof(namePath));
-		//printf("namePath %s\n", namePath);
+		strncat(namePath, fileName, sizeof(namePath) - 1);
 
 		this->data = CAppContainer::getInstance()->zipFile->readZipFileEntry(namePath, &this->fileSize);
 		if (this->data) {
@@ -52,8 +51,8 @@ bool InputStream::loadFile(const char* fileName, int loadType) {
 	}
 	else if (loadType == LT_SOUND_RESOURCE) { // [GEC]
 		strncpy(namePath, "Payload/Doom2rpg.app/Packages/sounds2/", sizeof(namePath));
-		strncat(namePath, fileName, sizeof(namePath));
-		//printf("namePath %s\n", namePath);
+		strncat(namePath, fileName, sizeof(namePath) - 1);
+		printf("namePath %s\n", namePath);
 
 		this->data = CAppContainer::getInstance()->zipFile->readZipFileEntry(namePath, &this->fileSize);
 		if (this->data) {
@@ -190,12 +189,18 @@ OutputStream::~OutputStream() {
 }
 
 #include <sys/stat.h>
+#ifdef __vita__
+#include <vitasdk.h>
+#endif
 
 int OutputStream::openFile(const char* fileName, int openMode) {
 	char namePath[2060];
 
 	struct stat sb;
 	if (stat(dir, &sb)) {
+#ifdef __vita__
+		sceIoMkdir(dir, 0777);
+#else
 		char command[64];
 		std::strcpy(command, "mkdir ");
 		std::strcat(command, "\"");
@@ -203,6 +208,7 @@ int OutputStream::openFile(const char* fileName, int openMode) {
 		std::strcat(command, "\"");
 		//printf("command %s\n", command);
 		std::system(command);
+#endif
 	}
 
 	std::strcpy(namePath, dir);

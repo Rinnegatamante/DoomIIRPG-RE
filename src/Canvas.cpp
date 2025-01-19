@@ -2918,8 +2918,8 @@ bool Canvas::handleEvent(int key) {
 			if ((keyAction == Enums::ACTION_FIRE && this->scrollingTextDone) || key == 18) {
 				this->endingGame = false;
 				app->sound->soundStop();
-				app->menuSystem->imgMainBG->~Image();
-				app->menuSystem->imgLogo->~Image();
+				delete app->menuSystem->imgMainBG;
+				delete app->menuSystem->imgLogo;
 				app->menuSystem->imgMainBG = app->loadImage(Resources::RES_LOGO_BMP_GZ, true);
 				app->menuSystem->imgLogo = app->loadImage(Resources::RES_LOGO2_BMP_GZ, true);
 				app->menuSystem->background = app->menuSystem->imgMainBG;
@@ -3878,7 +3878,7 @@ void Canvas::logoState() {
 		this->repaintFlags |= Canvas::REPAINT_STARTUP_LOGO;
 	}
 	else {
-		this->imgStartupLogo->~Image();
+		delete this->imgStartupLogo;
 		this->imgStartupLogo = nullptr;
 
 		this->setState(Canvas::ST_INTRO_MOVIE);
@@ -4510,7 +4510,7 @@ void Canvas::backToMain(bool b) {
 	app->render->unloadMap();
 	app->render->endFade();
 
-	app->menuSystem->imgMainBG->~Image();
+	delete app->menuSystem->imgMainBG;
 	app->menuSystem->imgMainBG = app->loadImage("logo.bmp", true);
 
 	if (b) {
@@ -6678,27 +6678,27 @@ void Canvas::initTravelMap() {
 }
 
 void Canvas::disposeTravelMap() {
-	this->imgNameHighlight->~Image();
+	delete this->imgNameHighlight;
 	this->imgNameHighlight = nullptr;
-	this->imgMagGlass->~Image();
+	delete this->imgMagGlass;
 	this->imgMagGlass = nullptr;
-	this->imgTravelBG->~Image();
+	delete this->imgTravelBG;
 	this->imgTravelBG = nullptr;
-	this->imgTravelPath->~Image();
+	delete this->imgTravelPath;
 	this->imgTravelPath = nullptr;
-	this->imgSpaceShip->~Image();
+	delete this->imgSpaceShip;
 	this->imgSpaceShip = nullptr;
-	this->imgTierCloseUp->~Image();
+	delete this->imgTierCloseUp;
 	this->imgTierCloseUp = nullptr;
-	this->imgEarthCloseUp->~Image();
+	delete this->imgEarthCloseUp;
 	this->imgEarthCloseUp = nullptr;
-	this->imgMapHorzGridLines->~Image();
+	delete this->imgMapHorzGridLines;
 	this->imgMapHorzGridLines = nullptr;
-	this->imgMapVertGridLines->~Image();
+	delete this->imgMapVertGridLines;
 	this->imgMapVertGridLines = nullptr;
 
 	// Unused
-	this->imgStarField->~Image();
+	delete this->imgStarField;
 	this->imgStarField = nullptr;
 }
 
@@ -7102,7 +7102,7 @@ void Canvas::exitIntroMovie(bool b) {
 
 	app->game->cleanUpCamMemory();
 
-	this->imgProlog->~Image();
+	delete this->imgProlog;
 	this->imgProlog = nullptr;
 
 	if (this->dialogBuffer) {
@@ -7715,35 +7715,35 @@ void Canvas::handleMiniGameHelpScreenScroll(int i) {
 }
 
 void Canvas::disposeCharacterSelection() {
-	this->imgCharacter_select_stat_bar->~Image();
+	delete this->imgCharacter_select_stat_bar;
 	this->imgCharacter_select_stat_bar = nullptr;
-	this->imgCharacter_select_stat_header->~Image();
+	delete this->imgCharacter_select_stat_header;
 	this->imgCharacter_select_stat_header = nullptr;
-	this->imgTopBarFill->~Image();
+	delete this->imgTopBarFill;
 	this->imgTopBarFill = nullptr;
-	this->imgCharacter_upperbar->~Image();
+	delete this->imgCharacter_upperbar;
 	this->imgCharacter_upperbar = nullptr;
-	this->imgCharacterSelectionAssets->~Image();
+	delete this->imgCharacterSelectionAssets;
 	this->imgCharacterSelectionAssets = nullptr;
-	this->imgCharSelectionBG->~Image();
+	delete this->imgCharSelectionBG;
 	this->imgCharSelectionBG = nullptr;
-	this->imgMajorMugs->~Image();
+	delete this->imgMajorMugs;
 	this->imgMajorMugs = nullptr;
-	this->imgSargeMugs->~Image();
+	delete this->imgSargeMugs;
 	this->imgSargeMugs = nullptr;
-	this->imgScientistMugs->~Image();
+	delete this->imgScientistMugs;
 	this->imgScientistMugs = nullptr;
-	this->imgMajor_legs->~Image();
+	delete this->imgMajor_legs;
 	this->imgMajor_legs = nullptr;
-	this->imgMajor_torso->~Image();
+	delete this->imgMajor_torso;
 	this->imgMajor_torso = nullptr;
-	this->imgRiley_legs->~Image();
+	delete this->imgRiley_legs;
 	this->imgRiley_legs = nullptr;
-	this->imgRiley_torso->~Image();
+	delete this->imgRiley_torso;
 	this->imgRiley_torso = nullptr;
-	this->imgSarge_legs->~Image();
+	delete this->imgSarge_legs;
 	this->imgSarge_legs = nullptr;
-	this->imgSarge_torso->~Image();
+	delete this->imgSarge_torso;
 	this->imgSarge_torso = nullptr;
 }
 

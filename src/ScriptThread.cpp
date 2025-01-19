@@ -2023,8 +2023,11 @@ uint32_t ScriptThread::run() {
                 this->app->render->useCaldexHack = (this->getByteArg() != 0);
                 break;
             }
-
+#ifdef __vita__
+            case 0xFF: { // EV_END
+#else
             case Enums::EV_END: { // EV_END
+#endif
                 if (this->stackPtr != 0) {
                     app->Error("The frame pointer should be zero if the script has completed.", 102);
                 }

@@ -1968,7 +1968,7 @@ void Game::saveConfig() {
 	else {
 		app->Error("I/O Error in saveConfig"); // ERR_SAVECONFIG
 	}
-	OS.~OutputStream();
+	//OS.~OutputStream();
 }
 
 void Game::loadConfig() {
@@ -2051,7 +2051,7 @@ void Game::loadConfig() {
 			IS.close();
 		}
 	}
-	IS.~InputStream();
+	//IS.~InputStream();
 }
 
 void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int viewAngle, int viewPitch, int prevX, int prevY, int saveX, int saveY, int saveZ, int saveAngle, int savePitch, int saveType) {
@@ -2081,7 +2081,7 @@ void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int vie
 
 		if (OS.openFile(name, 1)) {
 			if (!this->savePlayerState(&OS, loadMapID, viewX, viewY, viewAngle, viewPitch, prevX, prevY, saveX, saveY, saveZ, saveAngle, savePitch)) {
-				OS.~OutputStream();
+				//OS.~OutputStream();
 				OS.close();
 				return;
 			}
@@ -2111,7 +2111,7 @@ void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int vie
 
 	app->canvas->loadRuntimeData();
 
-	OS.~OutputStream();
+	//OS.~OutputStream();
 }
 
 void Game::saveLevelSnapshot() {
@@ -2147,7 +2147,7 @@ void Game::saveLevelSnapshot() {
 			}
 		}
 	}
-	OS.~OutputStream();
+	//OS.~OutputStream();
 }
 
 bool Game::savePlayerState(OutputStream* OS, int loadMapID, int viewX, int viewY, int viewAngle, int viewPitch, int prevX, int prevY, int saveX, int saveY, int saveZ, int saveAngle, int savePitch) {
@@ -2216,7 +2216,7 @@ bool Game::loadState(int activeLoadType) {
 		app->Error("loadState: failed to open player file");
 	}
 
-	IS.~InputStream();
+	//IS.~InputStream();
 	return rtn;
 }
 
@@ -2228,7 +2228,7 @@ bool Game::hasConfig() {
 			return true;
 		}
 	}
-	IS.~InputStream();
+	//IS.~InputStream();
 	return false;
 }
 
@@ -2366,7 +2366,7 @@ void Game::saveEmptyConfig() {
 	else {
 		app->Error("I/O Error in saveConfig");
 	}
-	OS.~OutputStream();
+	//OS.~OutputStream();
 }
 
 bool Game::canSnapMonsters() {

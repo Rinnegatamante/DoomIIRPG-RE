@@ -60,9 +60,13 @@ bool SDLGL::Initialize() {
 
 		this->oldResolutionIndex = -1;
 		this->resolutionIndex = 0;
+#ifdef __vita__
+		this->winVidWidth = 960;//Applet::IOS_WIDTH*2;
+		this->winVidHeight = 544;//Applet::IOS_HEIGHT*2;
+#else
 		this->winVidWidth = sdlResVideoModes[this->resolutionIndex].width;//Applet::IOS_WIDTH*2;
 		this->winVidHeight = sdlResVideoModes[this->resolutionIndex].height;//Applet::IOS_HEIGHT*2;
-
+#endif
 		//this->winVidWidth = 1440;
 		//this->winVidHeight = 900;
 

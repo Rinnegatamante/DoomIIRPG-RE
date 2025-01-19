@@ -164,7 +164,8 @@ Image* Applet::createImage(InputStream* inputStream, bool isTransparentMask)
 {
 	Image* img;
 	int Width, Height, offBeg, BitsPerPixel, ColorsUsed, rgb, pitch;
-	img = (Image*)std::malloc(sizeof(Image));
+	img = new Image();
+	
 	img->texture = -1;
 	img->piDIB = (IDIB*)std::malloc(sizeof(IDIB));
 	img->piDIB->pBmp = nullptr;
@@ -311,7 +312,10 @@ Image* Applet::createImage(InputStream* inputStream, bool isTransparentMask)
 		img->height = img->piDIB->height;
 	}
 	else {
-		img->~Image();
+		img->piDIB->~IDIB();
+		std::free(img->piDIB);
+		img->piDIB = nullptr;
+		delete img;
 		img = nullptr;
 
 		Error("Expected image bpp 4 or 8. Found bpp %d", BitsPerPixel);
@@ -327,11 +331,10 @@ Image* Applet::loadImage(char* fileName, bool isTransparentMask) {
 	if (iStream.loadResource(fileName) == 0) {
 		Applet::Error("Failed to open image: %s", fileName);
 	}
-
 	img = this->createImage(&iStream, isTransparentMask);
 
 	iStream.close();
-	iStream.~InputStream();
+	//iStream.~InputStream();
 	return img;
 }
 
@@ -470,17 +473,17 @@ void Applet::loadRuntimeImages() {
 		this->hud->imgBottomBarIcons = this->loadImage("Hud_Fill.bmp", true);
 		this->hud->imgHudFill = this->loadImage("Hud_Actions.bmp", true);
 		
-		this->hud->imgPlayerFrameNormal->~Image();
+		delete this->hud->imgPlayerFrameNormal;
 		this->hud->imgPlayerFrameNormal = nullptr;
-		this->hud->imgPlayerFrameActive->~Image();
+		delete this->hud->imgPlayerFrameActive;
 		this->hud->imgPlayerFrameActive = nullptr;
 
 		this->hud->imgPlayerFrameNormal = this->loadImage("HUD_Player_frame_Normal.bmp", true);
 		this->hud->imgPlayerFrameActive = this->loadImage("HUD_Player_frame_Active.bmp", true);
 
-		this->hud->imgPlayerFaces->~Image();
+		delete this->hud->imgPlayerFaces;
 		this->hud->imgPlayerFaces = nullptr;
-		this->hud->imgPlayerActive->~Image();
+		delete this->hud->imgPlayerActive;
 		this->hud->imgPlayerActive = nullptr;
 
 		if (this->player->characterChoice == 1) {
@@ -508,35 +511,35 @@ void Applet::loadRuntimeImages() {
 }
 
 void Applet::freeRuntimeImages() {
-	this->canvas->imgMapCursor->~Image();
+	delete this->canvas->imgMapCursor;
 	this->canvas->imgMapCursor = nullptr;
-	this->canvas->imgUIImages->~Image();
+	delete this->canvas->imgUIImages;
 	this->canvas->imgUIImages = nullptr;
-	this->canvas->imgDialogScroll->~Image();
+	delete this->canvas->imgDialogScroll;
 	this->canvas->imgDialogScroll = nullptr;
-	this->hud->imgScope->~Image();
+	delete this->hud->imgScope;
 	this->hud->imgScope = nullptr;
-	this->hud->imgDamageVignette->~Image();
+	delete this->hud->imgDamageVignette;
 	this->hud->imgDamageVignette = nullptr;
-	this->hud->imgActions->~Image();
+	delete this->hud->imgActions;
 	this->hud->imgActions = nullptr;
-	this->hud->imgBottomBarIcons->~Image();
+	delete this->hud->imgBottomBarIcons;
 	this->hud->imgBottomBarIcons = nullptr;
-	this->hud->imgHudFill->~Image();
+	delete this->hud->imgHudFill;
 	this->hud->imgHudFill = nullptr;
-	this->hud->imgPlayerFaces->~Image();
+	delete this->hud->imgPlayerFaces;
 	this->hud->imgPlayerFaces = nullptr;
-	this->hud->imgPlayerActive->~Image();
+	delete this->hud->imgPlayerActive;
 	this->hud->imgPlayerActive = nullptr;
-	this->hud->imgDamageVignetteBot->~Image();
+	delete this->hud->imgDamageVignetteBot;
 	this->hud->imgDamageVignetteBot = nullptr;
-	this->hud->imgHudTest->~Image();
+	delete this->hud->imgHudTest;
 	this->hud->imgHudTest = nullptr;
-	this->hud->imgSentryBotFace->~Image();
+	delete this->hud->imgSentryBotFace;
 	this->hud->imgSentryBotFace = nullptr;
-	this->hud->imgSentryBotActive->~Image();
+	delete this->hud->imgSentryBotActive;
 	this->hud->imgSentryBotActive = nullptr;
-	this->hud->imgCockpitOverlay->~Image();
+	delete this->hud->imgCockpitOverlay;
 	this->hud->imgCockpitOverlay = nullptr;
 }
 

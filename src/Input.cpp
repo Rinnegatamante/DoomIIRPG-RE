@@ -77,22 +77,22 @@ float   gCurMouseY;
 keyMapping_t keyMapping[KEY_MAPPIN_MAX];
 keyMapping_t keyMappingTemp[KEY_MAPPIN_MAX];
 keyMapping_t keyMappingDefault[KEY_MAPPIN_MAX] = {
-    {AVK_UP | AVK_MENU_UP,				{SDL_SCANCODE_UP,SDL_SCANCODE_W,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move forward
-    {AVK_DOWN | AVK_MENU_DOWN,			{SDL_SCANCODE_DOWN,SDL_SCANCODE_S,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move backward
-    {AVK_LEFT | AVK_MENU_PAGE_UP,		{SDL_SCANCODE_LEFT,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn left/page up
-    {AVK_RIGHT | AVK_MENU_PAGE_DOWN,	{SDL_SCANCODE_RIGHT,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn right/page down
+    {AVK_UP | AVK_MENU_UP,				{SDL_SCANCODE_UP,SDL_SCANCODE_W, (int)GamepadInput::BTN_DPAD_UP | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1}},	// Move forward
+    {AVK_DOWN | AVK_MENU_DOWN,			{SDL_SCANCODE_DOWN,SDL_SCANCODE_S, (int)GamepadInput::BTN_DPAD_DOWN | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1}},	// Move backward
+    {AVK_LEFT | AVK_MENU_PAGE_UP,		{SDL_SCANCODE_LEFT, (int)GamepadInput::BTN_DPAD_LEFT | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn left/page up
+    {AVK_RIGHT | AVK_MENU_PAGE_DOWN,	{SDL_SCANCODE_RIGHT, (int)GamepadInput::BTN_DPAD_RIGHT | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn right/page down
     {AVK_MOVELEFT,						{SDL_SCANCODE_A,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move left
     {AVK_MOVERIGHT,						{SDL_SCANCODE_D,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move right
-    {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Next weapon
-    {AVK_PREVWEAPON,					{SDL_SCANCODE_X,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Prev weapon
-    {AVK_SELECT | AVK_MENU_SELECT,		{SDL_SCANCODE_RETURN,-1,-1,-1,-1,-1,-1,-1,-1,-1}},  // Attack/Talk/Use
-    {AVK_PASSTURN,						{SDL_SCANCODE_C,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Pass Turn
-    {AVK_AUTOMAP,						{SDL_SCANCODE_TAB,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Automap
-    {AVK_MENUOPEN | AVK_MENU_OPEN,		{SDL_SCANCODE_ESCAPE,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Open menu/back
-    {AVK_ITEMS_INFO,                    {SDL_SCANCODE_I,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu items and info
-    {AVK_DRINKS,		                {SDL_SCANCODE_O,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu Dirnks
+    {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z, (int)GamepadInput::BTN_RIGHT_SHOULDER | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},		// Next weapon
+    {AVK_PREVWEAPON,					{SDL_SCANCODE_X, -1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Prev weapon
+    {AVK_SELECT | AVK_MENU_SELECT,		{SDL_SCANCODE_RETURN, (int)GamepadInput::BTN_A | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},  // Attack/Talk/Use
+    {AVK_PASSTURN,						{SDL_SCANCODE_C, (int)GamepadInput::BTN_B | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},		// Pass Turn
+    {AVK_AUTOMAP,						{SDL_SCANCODE_TAB, (int)GamepadInput::BTN_GUIDE | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Automap
+    {AVK_MENUOPEN | AVK_MENU_OPEN,		{SDL_SCANCODE_ESCAPE, (int)GamepadInput::BTN_START | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	// Open menu/back
+    {AVK_ITEMS_INFO,                    {SDL_SCANCODE_I, (int)GamepadInput::BTN_Y | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu items and info
+    {AVK_DRINKS,		                {SDL_SCANCODE_O, (int)GamepadInput::BTN_LEFT_SHOULDER | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu Dirnks
     {AVK_PDA,		                    {SDL_SCANCODE_P,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu PDA
-    {AVK_BOTDISCARD,		            {SDL_SCANCODE_B,-1,-1,-1,-1,-1,-1,-1,-1,-1}}	    // Bot discart
+    {AVK_BOTDISCARD,		            {SDL_SCANCODE_B, (int)GamepadInput::BTN_X | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}}	    // Bot discart
 };
 
 //--------------------

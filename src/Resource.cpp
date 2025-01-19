@@ -202,7 +202,7 @@ int* Resource::loadFileIndex(char* fileName) {
     this->shiftByte();
     array[(n4 * 3) - 1] = this->shiftInt() - array[(n4 * 3) - 2];
     IS.close();
-    IS.~InputStream();
+    //IS.~InputStream();
     return array;
 }
 
@@ -219,7 +219,7 @@ void Resource::initTableLoading() {
         this->tableOffsets[i] = this->shiftInt();
     }
     IS.close();
-    IS.~InputStream();
+    //IS.~InputStream();
 }
 
 void Resource::beginTableLoading() {

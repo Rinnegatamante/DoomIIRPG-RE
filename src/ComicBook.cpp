@@ -486,8 +486,9 @@ void ComicBook::CheckImageExistence(Image* image) {
 
 void ComicBook::DrawImage(Image* image, int a3, int a4, char a5, float alpha, char a7)
 {
+#ifndef __vita__
     PFNGLACTIVETEXTUREPROC glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
-
+#endif
     int v10; // r3
     float width; // s13
     float height; // s11
@@ -957,11 +958,11 @@ void ComicBook::TouchMove(int x, int y)
 void ComicBook::DeleteImages() {
     this->isLoaded = false;
     for (int i = 0; i < 17; i++) {
-        this->imgComicBook[i]->~Image();
+        delete this->imgComicBook[i];
         this->imgComicBook[i] = nullptr;
     }
     for (int i = 0; i < 39; i++) {
-        this->imgiPhoneComicBook[i]->~Image();
+        delete this->imgiPhoneComicBook[i];
         this->imgiPhoneComicBook[i] = nullptr;
     }
     this->comicBookIndex = 0;

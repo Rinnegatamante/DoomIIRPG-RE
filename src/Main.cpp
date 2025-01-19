@@ -22,15 +22,36 @@
 #include "TinyGL.h"
 #include "Input.h"
 
+#ifdef __vita__
+#include <vitasdk.h>
+int _newlib_heap_size_user = 128 * 1024 * 1024;
+#endif
+
 void drawView(SDLGL* sdlGL);
 
-int main(int argc, char* args[]) {
+#ifdef __vita__
+int real_main (unsigned int argc, void* argv);
 
+int main(int argc, char **argv) {
+	// We need a bigger stack to run Doom II RPG, so we create a new thread with a proper stack size
+	SceUID main_thread = sceKernelCreateThread("Doom II RPG", real_main, 0x40, 0x800000, 0, 0, NULL);
+	if (main_thread >= 0){
+		sceKernelStartThread(main_thread, 0, NULL);
+	}
+	return sceKernelExitDeleteThread(0);
+}
+int real_main (unsigned int argc, void* argv) {
+#else
+int main(int argc, char* args[]) {
+#endif
     int		UpTime = 0;
     
     ZipFile zipFile;
+#ifdef __vita__
+    zipFile.openZipFile("ux0:data/doom2rpg/Doom 2 RPG.ipa");
+#else
     zipFile.openZipFile("Doom 2 RPG.ipa");
-
+#endif
 	SDLGL sdlGL;
 	sdlGL.Initialize();
 
@@ -78,8 +99,8 @@ int main(int argc, char* args[]) {
     printf("APP_QUIT\n");
     CAppContainer::getInstance()->~CAppContainer();
     zipFile.closeZipFile();
-    sdlGL.~SDLGL();
-    input.~Input();
+    //sdlGL.~SDLGL();
+    //input.~Input();
 	return 0;
 }
 
@@ -100,8 +121,11 @@ void drawView(SDLGL *sdlGL) {
     if (w != cx || h != cy) {
         w = cx; h = cy;
     }
-
+#ifdef __vita__
+    glViewport(0, 0, (GLsizei)960, (GLsizei)544);
+#else
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+#endif
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glMatrixMode(GL_PROJECTION);

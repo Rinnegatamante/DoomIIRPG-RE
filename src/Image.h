@@ -1,7 +1,11 @@
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
 
+#ifdef __vita__
+#include <vitaGL.h>
+#else
 #include <SDL_opengl.h>
+#endif
 
 class IDIB;
 
@@ -10,6 +14,7 @@ class Image
 private:
 
 public:
+	uint32_t index;
 	IDIB* piDIB;
 	int width;
 	int height;

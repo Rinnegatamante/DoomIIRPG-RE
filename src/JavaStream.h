@@ -6,8 +6,11 @@
 #define LT_RESOURCE 5
 #define LT_FILE		6
 #define LT_SOUND_RESOURCE	7 // [GEC]
+#ifdef __vita__
+static constexpr const char* dir = "ux0:data/doom2rpg/Doom2rpg.app";
+#else
 static constexpr const char* dir = "Doom2rpg.app";
-
+#endif
 class Applet;
 
 // ------------------

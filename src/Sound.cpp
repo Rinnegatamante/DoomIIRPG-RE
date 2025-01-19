@@ -17,10 +17,10 @@ Sound::~Sound() {
 	this->openAL_Close();
 }
 
-#define OpenAL_ERROR(id)		\
+#define OpenAL_ERROR()		\
 	error = alGetError();		\
 	if (error != AL_NO_ERROR) {	\
-		printf("OpenAL error: %s, file: %s [%d]\n", alGetString(error) , "/Users/greghodges/doom2rpg/trunk/Doom2rpg_iphone/xcode/Classes/Sound.cpp", id);	\
+		printf("OpenAL error: %s, file: %s [%d]\n", alGetString(error) , "/Users/greghodges/doom2rpg/trunk/Doom2rpg_iphone/xcode/Classes/Sound.cpp", __LINE__);	\
 	}
 
 bool Sound::startup() {
@@ -58,11 +58,17 @@ void Sound::openAL_Init() {
 	}
 	else {
 		this->alDevice = alcOpenDevice(nullptr);
-		OpenAL_ERROR(522);
+		OpenAL_ERROR();
 
 		if (this->alDevice) {
-			ALCcontext* context = alcCreateContext(this->alDevice, nullptr);
-			OpenAL_ERROR(527);
+			int attrlist[6];
+			attrlist[0] = ALC_FREQUENCY;
+			attrlist[1] = 44100;
+			attrlist[2] = ALC_SYNC;
+			attrlist[3] = AL_FALSE;
+			attrlist[4] = 0;
+			ALCcontext* context = alcCreateContext(this->alDevice, attrlist);
+			OpenAL_ERROR();
 
 			if (context) {
 				alcMakeContextCurrent(context);
@@ -72,12 +78,12 @@ void Sound::openAL_Init() {
 				alcCloseDevice(this->alDevice);
 			}
 		}
-		OpenAL_ERROR(540);
+		OpenAL_ERROR();
 
 		//this->openAL_SetSystemVolume(100);
 		alListener3i(AL_POSITION, 0, 0, 0);
 		alListener3i(AL_VELOCITY, 0, 0, 0);
-		OpenAL_ERROR(546);
+		OpenAL_ERROR();
 	}
 }
 
@@ -130,7 +136,7 @@ bool Sound::openAL_IsPlaying(ALuint source) {
 	ALenum error;
 	ALint source_state;
 	alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-	OpenAL_ERROR(685);
+	OpenAL_ERROR();
 	return (source_state == AL_PLAYING) ? true : false;
 }
 
@@ -138,12 +144,12 @@ bool Sound::openAL_IsPaused(ALuint source) {
 	ALenum error;
 	ALint source_state;
 	alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-	OpenAL_ERROR(694);
+	OpenAL_ERROR();
 	return (source_state == AL_PAUSED) ? true : false;
 }
 
 bool Sound::openAL_GetALFormat(AudioStreamBasicDescription aStreamBD, ALenum* format) {
-	if ((aStreamBD.mFormatID == 'lpcm') && (aStreamBD.mChannelsPerFrame - 1U < 2)) {
+	if ((aStreamBD.mFormatID == 0x6C70636D) && (aStreamBD.mChannelsPerFrame - 1U < 2)) {
 		if (aStreamBD.mBitsPerChannel == 8) {
 			if (aStreamBD.mChannelsPerFrame == 1) {
 				*format = AL_FORMAT_MONO8;
@@ -169,20 +175,20 @@ bool Sound::openAL_GetALFormat(AudioStreamBasicDescription aStreamBD, ALenum* fo
 void Sound::openAL_PlaySound(ALuint source, ALint loop) {
 	ALenum error;
 	alSourcei(source, AL_LOOPING, (loop != 0) ? AL_TRUE : AL_FALSE);
-	OpenAL_ERROR(708);
+	OpenAL_ERROR();
 	alSourcePlay(source);
-	OpenAL_ERROR(711);
+	OpenAL_ERROR();
 }
 
 void Sound::openAL_LoadSound(int resID, Sound::SoundStream* channel) {
 	ALenum error;
 	printf("openAL_LoadSound... resID: %d buffer: %d\n", resID, channel->bufferId);
 	int index = (uint16_t)(resID - 1000);
-	OpenAL_ERROR(596);
+	OpenAL_ERROR();
 
 	printf("Loading sound...\nName: %s\nResourceID: %d\nAL buffer: %d\n", Sounds::RESOURCE_FILE_NAMES[index], resID, channel->bufferId);
 	if (this->openAL_LoadWAVFromFile(channel->bufferId, Sounds::RESOURCE_FILE_NAMES[index])) {
-		OpenAL_ERROR(606);
+		OpenAL_ERROR();
 	}
 	else {
 		this->app->Error("Sound resource not found\n!");
@@ -201,7 +207,7 @@ bool Sound::openAL_LoadWAVFromFile(ALuint bufferId, const char* fileName) {
 	if (this->openAL_LoadAudioFileData(fileName, &format, &data, &size, &freq)) {
 		alBufferData(bufferId, format, data, size, freq);
 		std::free(data);
-		OpenAL_ERROR(939);
+		OpenAL_ERROR();
 		return true;
 	}
 	return false;
@@ -239,7 +245,7 @@ bool Sound::openAL_LoadAudioFileData(const char* fileName, ALenum* format, ALvoi
 			this->app->Error("Not a valid WAV file, file not in PCM format\n!");
 		}
 
-		outPropertyData.mFormatID = 'lpcm';
+		outPropertyData.mFormatID = 0x6C70636D; // 'lpcm'
 		outPropertyData.mChannelsPerFrame = IS.readShort(); // Get number of channels. 
 		outPropertyData.mSampleRate = IS.readInt(); // Get sampler rate. 
 		IS.readInt(); // Block Align
@@ -255,7 +261,7 @@ bool Sound::openAL_LoadAudioFileData(const char* fileName, ALenum* format, ALvoi
 		IS.read((uint8_t*)*data, 0, *size); // Read audio data into buffer.
 
 		IS.close();
-		IS.~InputStream();
+		//IS.~InputStream();
 
 		if (!this->openAL_GetALFormat(outPropertyData, format)) {
 			this->app->Error("openAL: Error formatting");
@@ -264,7 +270,7 @@ bool Sound::openAL_LoadAudioFileData(const char* fileName, ALenum* format, ALvoi
 		*freq = (int)outPropertyData.mSampleRate;
 		return true;
 	}
-	IS.~InputStream();
+	//IS.~InputStream();
 	return false;
 }
 
@@ -286,7 +292,7 @@ bool Sound::openAL_LoadAllSounds() {
 			alSource3i(this->channel[i].sourceId, AL_POSITION, 0, 0, 0);
 			alSourcei(this->channel[i].sourceId, AL_REFERENCE_DISTANCE, 5000000);
 		}
-		OpenAL_ERROR(643);
+		OpenAL_ERROR();
 		this->soundsLoaded = true;
 		return true;
 	}
@@ -415,7 +421,7 @@ void Sound::playSound(int16_t resID, uint8_t flags, int priority, bool a5) {
 				channel->resID = resID;
 				channel->priority = priority;
 				alSourceStop(channel->sourceId);
-				alSourcei(channel->sourceId, AL_BUFFER, NULL);
+				alSourcei(channel->sourceId, AL_BUFFER, (ALint)NULL);
 				this->openAL_LoadSound(v5, &this->channel[FreeSlot]);
 				alSourcei(channel->sourceId, AL_BUFFER, channel->bufferId);
 				if ((unsigned int)(channel->resID - 1067) > 4)
@@ -423,7 +429,7 @@ void Sound::playSound(int16_t resID, uint8_t flags, int priority, bool a5) {
 				else
 					soundFxVolume = this->musicVolume;
 				this->openAL_SetVolume(channel->sourceId, soundFxVolume);
-				OpenAL_ERROR(258);
+				OpenAL_ERROR();
 			}
 			else
 			{
@@ -433,7 +439,7 @@ void Sound::playSound(int16_t resID, uint8_t flags, int priority, bool a5) {
 				else
 					musicVolume = this->musicVolume;
 				this->openAL_SetVolume(channel->sourceId, musicVolume);
-				OpenAL_ERROR(214);
+				OpenAL_ERROR();
 			}
 
 			this->openAL_PlaySound(channel->sourceId, (flags & 1) ? 1 : 0);

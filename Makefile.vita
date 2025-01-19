@@ -1,0 +1,44 @@
+TARGET		:= "Doom II RPG"
+TITLE		:= DOOMIIRPG
+
+LIBS = -lSDL2 -lvitaGL -lvitashark -lSceShaccCgExt -ltaihen_stub -lvorbisfile -lvorbis -logg \
+	-lspeexdsp -lmpg123 -lScePspnetAdhoc_stub -lSceShaccCg_stub -lSceKernelDmacMgr_stub \
+	-lopenal -lc -lSceCommonDialog_stub -lSceAudio_stub -lSceLibKernel_stub -lmathneon \
+	-lSceNet_stub -lSceNetCtl_stub -lpng -lSceDisplay_stub -lSceGxm_stub -lSceHid_stub \
+	-Wl,--whole-archive -lpthread -lSceSysmodule_stub -Wl,--no-whole-archive -lSceIme_stub \
+	-lSceCtrl_stub -lSceTouch_stub -lSceMotion_stub -lm -lSceAppMgr_stub -lSceAudioIn_stub \
+	-lSceAppUtil_stub -lScePgf_stub -ljpeg -lSceRtc_stub -lScePower_stub -lcurl -lssl -lcrypto -lz
+
+CPPSOURCES	:= src
+
+CFILES	:= $(COMMON_OBJS)
+CPPFILES   := $(foreach dir,$(CPPSOURCES), $(wildcard $(dir)/*.cpp))
+OBJS     := $(CFILES:.c=.o) $(CPPFILES:.cpp=.o)
+
+PREFIX  = arm-vita-eabi
+CC      = $(PREFIX)-gcc
+CXX      = $(PREFIX)-g++
+CFLAGS  = -fsigned-char -Wl,-q -O3 -g -fno-optimize-sibling-calls -Wno-write-strings \
+	-ffast-math -mtune=cortex-a9 -mfpu=neon -Isrc -I$(VITASDK)/$(PREFIX)/include/SDL2 \
+	-I$(VITASDK)/$(PREFIX)/include/AL -fno-short-enums -fsigned-char
+CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=c++17
+ASFLAGS = $(CFLAGS)
+
+all: $(TITLE).vpk
+
+$(TITLE).vpk: $(TITLE).velf
+	vita-make-fself -c -s $< eboot.bin
+	vita-mksfoex -s TITLE_ID=$(TITLE) -d ATTRIBUTE2=12 $(TARGET) param.sfo
+	vita-pack-vpk -s param.sfo -b eboot.bin $(TITLE).vpk \
+		-a sce_sys=sce_sys
+
+%.velf: %.elf
+	cp $< $<.unstripped.elf
+	$(PREFIX)-strip -g $<
+	vita-elf-create $< $@
+
+$(TITLE).elf: $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
+
+clean:
+	@rm -rf $(TITLE).velf $(TITLE).elf $(OBJS) $(TITLE).elf.unstripped.elf $(TITLE).vpk eboot.bin param.sfo

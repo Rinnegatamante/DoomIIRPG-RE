@@ -526,7 +526,7 @@ void Render::FinalizeMedia() {
 	IS.close();
 	this->_gles->CreateAllActiveTextures();
 	app->canvas->updateLoadingBar(false);
-	IS.~InputStream();
+	//IS.~InputStream();
 }
 
 bool Render::beginLoadMap(int mapNameID) {
@@ -4267,9 +4267,9 @@ void DrawBitmap(short* buffer, int buffW, int buffH, int x, int y, int w, int h)
 	static GLuint textureName = -1;
 	float vp[12]; // [sp+18h] [bp-68h] BYREF
 	float st[8]; // [sp+48h] [bp-38h] BYREF
-
+#ifndef __vita__
 	PFNGLACTIVETEXTUREPROC glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
-
+#endif
 	vp[2] = 0.0;
 	vp[5] = 0.0;
 	vp[8] = 0.0;
@@ -4320,7 +4320,11 @@ void Render::Render3dScene(void) {
 	if (w != cx || h != cy) {
 		w = cx; h = cy;
 	}
+#ifdef __vita__
+	glViewport(0, 0, (GLsizei)960, (GLsizei)544);
+#else
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+#endif
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, Applet::IOS_WIDTH, Applet::IOS_HEIGHT, 0.0, -1.0, 1.0);

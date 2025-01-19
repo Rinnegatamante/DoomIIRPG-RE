@@ -8,6 +8,10 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+#ifdef __vita__
+#include <vitasdk.h>
+#endif
+
 void Error(const char* fmt, ...)
 {
 	char errMsg[256];
@@ -53,17 +57,17 @@ void Error(const char* fmt, ...)
 	exit(0);
 }
 
-static void* zip_alloc(void* ctx, unsigned int items, unsigned int size)
+static inline __attribute__((always_inline)) void* zip_alloc(void* ctx, unsigned int items, unsigned int size)
 {
 	return std::malloc(items * size);
 }
 
-static void zip_free(void* ctx, void* ptr)
+static inline __attribute__((always_inline)) void zip_free(void* ctx, void* ptr)
 {
 	std::free(ptr);
 }
 
-static int16_t _ReadShort(FILE* fp)
+static inline __attribute__((always_inline)) int16_t _ReadShort(FILE* fp)
 {
 	int16_t sData = 0;
 
@@ -74,7 +78,7 @@ static int16_t _ReadShort(FILE* fp)
 	return sData;
 }
 
-static int32_t _ReadInt(FILE* fp)
+static inline __attribute__((always_inline)) int32_t _ReadInt(FILE* fp)
 {
 	int32_t iData = 0;
 
@@ -92,7 +96,42 @@ ZipFile::ZipFile() {
 ZipFile::~ZipFile() {
 }
 
+#ifdef __vita__
+void ZipFile::scanDir(const char *name) {
+	int dir = sceIoDopen(name);
+	if (dir < 0) {
+		printf("Cannot find %s\n", name);
+		abort();
+	}
+	
+	//printf("Scanning %s\n", name);
+	SceIoDirent fd;
+	while (sceIoDread(dir, &fd) > 0) {
+		if (SCE_S_ISDIR(fd.d_stat.st_mode)) {
+			char subpath[512];
+			sprintf(subpath, "%s/%s", name, fd.d_name);
+			scanDir(subpath);
+		} else {
+			sprintf(entry[entry_count].name, "%s/%s", name, fd.d_name);
+			entry[entry_count].usize = fd.d_stat.st_size;
+			entry[entry_count].offset = entry_count;
+			entry_count++;
+		}
+	}
+	
+	sceIoDclose(dir);
+}
+#endif
+
 void ZipFile::findAndReadZipDir(int startoffset) {
+#ifdef __vita__
+	scanDir(this->path);
+	int dir = sceIoDopen(this->path);
+	if (dir < 0) {
+		printf("Cannot find %s\n", this->path);
+		abort();
+	}
+#else
 	int sig, offset, count;
 	int namesize, metasize, commentsize;
 	int i;
@@ -149,10 +188,17 @@ void ZipFile::findAndReadZipDir(int startoffset) {
 		fseek(this->file, metasize, SEEK_CUR);
 		fseek(this->file, commentsize, SEEK_CUR);
 	}
+#endif
 }
 
 void ZipFile::openZipFile(const char* name) {
-
+#ifdef __vita__
+	//printf("Opening %s\n", name);
+	memcpy(this->path, name, strlen(name) - 4);
+	this->path[strlen(name) - 4] = 0;
+	//printf("Translated into %s\n", this->path);
+	findAndReadZipDir(0);
+#else
 	uint8_t buf[512];
 	int filesize, back, maxback;
 	int i, n;
@@ -185,9 +231,11 @@ void ZipFile::openZipFile(const char* name) {
 	}
 
 	Error("cannot find end of central directory\n");
+#endif
 }
 
 void ZipFile::closeZipFile() {
+#ifndef __vita__
 	if (this) {
 		if (this->entry) {
 			std::free(this->entry);
@@ -199,9 +247,28 @@ void ZipFile::closeZipFile() {
 			this->file = nullptr;
 		}
 	}
+#endif
 }
 
 uint8_t* ZipFile::readZipFileEntry(const char* name, int* sizep) {
+#ifdef __vita__
+	char fullpath[512];
+	sprintf(fullpath, "%s/%s", this->path, name);
+	//printf("readZipFileEntry %s\n", fullpath);
+	FILE *f = fopen(fullpath, "rb");
+	if (!f) {
+		printf("Cannot open %s\n", fullpath);
+		abort();
+	}
+	fseek(f, 0, SEEK_END);
+	*sizep = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	uint8_t *res = (uint8_t *)std::malloc(*sizep);
+	fread(res, 1, *sizep, f);
+	fclose(f);
+	//printf("Done\n");
+	return res;
+#else
 	zip_entry_t* entry = nullptr;
 	int i, sig, general, method, namelength, extralength;
 	uint8_t* cdata;
@@ -243,8 +310,8 @@ uint8_t* ZipFile::readZipFileEntry(const char* name, int* sizep) {
 	extralength = _ReadShort(this->file); // extralength
 
 	fseek(this->file, namelength + extralength, SEEK_CUR);
-
-	cdata = (uint8_t*) malloc(entry->csize);
+	
+	cdata = (uint8_t*)std::malloc(entry->csize);
 	fread(cdata, sizeof(uint8_t), entry->csize, this->file);
 
 	if (method == 0)
@@ -254,7 +321,7 @@ uint8_t* ZipFile::readZipFileEntry(const char* name, int* sizep) {
 	}
 	else if (method == 8)
 	{
-		uint8_t* udata = (uint8_t*) malloc(entry->usize);
+		uint8_t* udata = (uint8_t*)std::malloc(entry->usize);
 		z_stream stream;
 
 		std::memset(&stream, 0, sizeof stream);
@@ -293,4 +360,5 @@ uint8_t* ZipFile::readZipFileEntry(const char* name, int* sizep) {
 	}
 
 	return nullptr;
+#endif
 }

@@ -259,7 +259,7 @@ bool MenuSystem::startup() {
 	btnVendingArrowDownGlow->highlightRenderMode = 0;
 	this->m_vendingButtons->AddButton(btnVendingArrowDownGlow);
 
-	IS.~InputStream();
+	//IS.~InputStream();
 	return true;
 }
 
@@ -3571,10 +3571,10 @@ void MenuSystem::startGame(bool b) {
 	Applet* app = CAppContainer::getInstance()->app;
 
 	if (this->background != this->imgMainBG) {
-		this->background->~Image();
+		delete this->background;
 	}
 
-	this->imgMainBG->~Image();
+	delete this->imgMainBG;
 
 	this->background = nullptr;
 	this->imgMainBG = nullptr;

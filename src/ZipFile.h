@@ -14,7 +14,11 @@
 
 typedef struct zip_entry_s
 {
+#ifdef __vita__
+	char name[512];
+#else
 	char* name;
+#endif
 	int offset;
 	int csize, usize;
 }zip_entry_t;
@@ -22,11 +26,16 @@ typedef struct zip_entry_s
 class ZipFile
 {
 private:
-	FILE* file;
 	int entry_count;
+#ifndef __vita__
 	zip_entry_t* entry;
+	FILE* file;
 	int page_count;
 	int* page;
+#else
+	zip_entry_t entry[1024];
+	char path[256];
+#endif
 public:
 
 	// Constructor
@@ -38,6 +47,9 @@ public:
 	void openZipFile(const char* name);
 	void closeZipFile();
 	uint8_t* readZipFileEntry(const char* name, int* sizep);
+#ifdef __vita__
+	void scanDir(const char *name);
+#endif
 };
 
 #endif

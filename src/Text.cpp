@@ -123,8 +123,8 @@ void Localization::freeAllBuffers() {
 }
 
 void Localization::allocateText(int index) {
-	this->text[index] = new char[this->textSizes[index]];
-	this->textMap[index] = new uint16_t[this->textCount[index]];
+	this->text[index] = new char[this->textSizes[index]]();
+	this->textMap[index] = new uint16_t[this->textCount[index]]();
 }
 
 void Localization::unloadText(int index) {
@@ -169,7 +169,7 @@ void Localization::finishTextLoading() {
 
 	this->textChunkStream->close();
 	if (this->textChunkStream != nullptr) {
-		this->textChunkStream->~InputStream();
+		//this->textChunkStream->~InputStream();
 		delete this->textChunkStream;
 	}
 	this->textChunkStream = nullptr;
@@ -519,10 +519,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 Text::Text(int countChars) {
 	printf("Text::init\n");
 
-	this->chars = new char[countChars];
-	std::memset(this->chars, 0, countChars);
+	this->chars = new char[countChars]();
 	this->_length = 0;
-	this->chars[0] = '\0';
 	this->stringWidth = -1;
 }
 
@@ -548,7 +546,7 @@ void Text::setLength(int i) {
 }
 
 Text* Text::deleteAt(int i, int i2) {
-	std::memcpy(this->chars + i, this->chars + i + i2, this->_length - (i + i2));
+	std::memmove(this->chars + i, this->chars + i + i2, this->_length - (i + i2));
 	this->_length -= i2;
 	this->chars[this->_length] = '\0';
 	return this;
@@ -598,7 +596,7 @@ Text* Text::append(Text* t, int i) {
 
 Text* Text::append(Text* t, int i, int i2) {
 	if (i2 > 0) {
-		std::memcpy(this->chars + this->_length, t->chars + i, i2);
+		std::memmove(this->chars + this->_length, t->chars + i, i2);
 		this->_length += i2;
 		this->chars[this->_length] = '\0';
 	}
@@ -606,14 +604,14 @@ Text* Text::append(Text* t, int i, int i2) {
 }
 
 Text* Text::insert(char c, int i) {
-	std::memcpy(this->chars + i + 1, this->chars + i, this->_length - i);
+	std::memmove(this->chars + i + 1, this->chars + i, this->_length - i);
 	this->chars[i] = c;
 	this->chars[++this->_length] = '\0';
 	return this;
 }
 
 Text* Text::insert(uint8_t c, int i) {
-	std::memcpy(this->chars + i + 1, this->chars + i, this->_length - i);
+	std::memmove(this->chars + i + 1, this->chars + i, this->_length - i);
 	this->chars[i] = c;
 	this->chars[++this->_length] = '\0';
 	return this;
@@ -637,7 +635,7 @@ Text* Text::insert(char* c, int i) {
 }
 
 Text* Text::insert(char* c, int i, int i2, int i3) {
-	std::memcpy(this->chars + i3 + i2, this->chars + i3, this->_length - i3);
+	std::memmove(this->chars + i3 + i2, this->chars + i3, this->_length - i3);
 	this->_length += i2;
 	while (--i2 >= 0) {
 		this->chars[i3++] = c[i++];
@@ -753,12 +751,10 @@ int Text::wrapText(int i, int i2, char c) {
 }
 
 int Text::wrapText(int i, int i2, int i3, char c) {
-	char wordBreaks[5];
+	char wordBreaks[] = "|\n- ";
 	char* chars, n8;
 	bool n9;
 	int length, n4, n5, n6, n7, n10, n11, n12;
-
-	std::memcpy(wordBreaks, "|\n- ", 5);
 
 	length = this->_length;
 	chars = this->chars;
