@@ -49,6 +49,7 @@ bool SDLGL::Initialize() {
 	if (!this->initialized) {
 		
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+		vglInitExtended(0, 960, 544, 4 * 1024 * 1024, SCE_GXM_MULTISAMPLE_4X);
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 			printf("Could not initialize SDL: %s", SDL_GetError());
 		}
